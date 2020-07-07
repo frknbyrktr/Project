@@ -13,7 +13,7 @@ namespace Project.Domain.Helpers
     public abstract class BaseDataServices<T> where T : BaseDataEntities, new()
     {
         readonly string ConnectionString =
-            @"Data Source=DESKTOP-9FP7BFG;Initial Catalog=Northwind;Integrated Security=True";
+            @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=Northwind;Integrated Security=True";
 
 
         protected IDbConnection Connection => new SqlConnection(ConnectionString);

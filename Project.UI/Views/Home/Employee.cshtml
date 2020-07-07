@@ -1,0 +1,146 @@
+﻿@section head {
+    <link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.3/jsgrid.min.css"/>
+    <link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.3/jsgrid-theme.min.css"/>
+}
+
+<div id="jsGrid"></div>
+
+@section scripts {
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.3/jsgrid.min.js"></script>
+    <script>
+        $(function() {
+            var token = $.parseJSON(localStorage.getItem("token"));
+            var accessToken;
+            if (token == null) {
+                alert("Giriş Yapmamışsınız");
+                return;
+            } else {
+                accessToken = token.token;
+            }
+            $.ajax({
+                url: "https://localhost:5001/api/personal",
+                type: "GET",
+                crossDomain: true,
+                dataType: "json",
+                headers: { "accept": "application/json", "content-type": "application/json", "authorization": "Bearer " + accessToken },
+                success: function(result) {
+                    console.log(result);
+                    toJsGrid(result);
+                },
+                error: function(xhr, status, error) {
+                    alert("err - " + status + " - " + error);
+                }
+            });
+
+            function toJsGrid(jsonData) {
+                $("#jsGrid").jsGrid({
+                    controller: {
+                        loadData: function(filter) {
+                            return $.ajax({
+                                url: "https://localhost:5001/api/personal",
+                                type: "GET",
+                                crossDomain: true,
+                                data: filter,
+                                dataType: "json",
+                                headers: { "accept": "application/json", "content-type": "application/json", "authorization": "Bearer " + accessToken },
+                                success: function(result) {
+
+                                    toJsGrid(result);
+                                },
+                                error: function(xhr, status, error) {
+                                    alert("err - " + status + " - " + error);
+                                }
+                            });
+                        },
+                        insertItem: function(item) {
+                            var myJson = JSON.stringify(item);
+                            console.log(myJson);
+                            return $.ajax({
+                                url: "https://localhost:5001/api/personal/create",
+                                type: "POST",
+                                crossDomain: true,
+                                data: myJson,
+                                dataType: "json",
+                                headers: { "accept": "application/json", "content-type": "application/json", "authorization": "Bearer " + accessToken },
+                                success: function(result) {
+                                    loadData();
+                                },
+                                error: function(xhr, status, error) {
+
+                                    alert("err - " + status + " - " + error);
+                                }
+                            });
+                        },
+                        deleteItem: function(item) {
+                            var myJson = JSON.stringify(item);
+                            return $.ajax({
+                                url: "https://localhost:5001/api/personal/delete",
+                                type: "POST",
+                                crossDomain: true,
+                                data: myJson,
+                                dataType: "json",
+                                headers: { "accept": "application/json", "content-type": "application/json", "authorization": "Bearer " + accessToken },
+                                success: function(result) {
+                                    loadData();
+                                },
+                                error: function(xhr, status, error) {
+
+                                    alert("err - " + status + " - " + error);
+                                }
+                            });
+                        },
+                        updateItem: function(item) {
+                            var myJson = JSON.stringify(item);
+                            return $.ajax({
+                                url: "https://localhost:5001/api/personal/update",
+                                type: "POST",
+                                crossDomain: true,
+                                data: myJson,
+                                dataType: "json",
+                                headers: { "accept": "application/json", "content-type": "application/json", "authorization": "Bearer " + accessToken },
+                                success: function (result) {
+                                    loadData();
+                                },
+                                error: function (xhr, status, error) {
+
+                                    alert("err - " + status + " - " + error);
+                                }
+                            });
+                        }
+                    },
+
+
+                    width: "100%",
+                    height: "auto",
+
+                    filtering: true,
+                    inserting: true,
+                    editing: true,
+                    sorting: true,
+                    paging: true,
+                    pageSize: 5,
+                    pageButtonCount: 5,
+
+                    noDataContent: "Veri yok!",
+                    confirmDeleting: true,
+                    deleteConfirm: "Silmek istediğinize emin misiniz?",
+                    pagerFormat: "Sayfa: {pages}",
+
+
+                    data: jsonData,
+
+                    fields: [
+                        { name: "id", title: "Id", type: "number", width: 150 },
+                        { name: "firstName", title: "İsim", type: "text", width: 150, validate: "required" },
+                        { name: "lastName", title: "Soyisim", type: "text", width: 150, validate: "required" },
+                        { name: "title", title: "Departman", type: "text", width: 150, validate: "required" },
+                        { name: "homePhone", title: "Telefon", type: "text", width: 150, validate: "required" },
+                        { name: "address", title: "Adres", type: "text", width: 150, validate: "required" },
+                        { type: "control" }
+                    ]
+                });
+            }
+
+        });
+    </script>
+}

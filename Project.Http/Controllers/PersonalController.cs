@@ -16,7 +16,7 @@ namespace Project.Http.Controllers
         private readonly EmployeeDataService _service = new EmployeeDataService();
 
         [HttpGet]
-        public ActionResult<List<Personal>> GetAllCommands()
+        public ActionResult<List<Employee>> GetAllCommands()
         {
 
             var items = _service.PersonalGetDataList();
